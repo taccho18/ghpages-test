@@ -11,37 +11,34 @@ defaults:
   run: 
     working-directory: .
 
-jobs:
-  test_job:
-    runs-on: ubuntu-latest
-    name: Test
-    steps:
+concurrency: # 重複実行時、前のをキャンセル
+  group: "pages"
+  cancel-in-progress: true
 
-      # first checkout your code
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: setup
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
           cache: npm
           cache-dependency-path: ./package-lock.json
       
-      - name: install & build
+      - name: install redoc & output html
         run: |
           npm install -g redoc-cli
           redoc-cli bundle openapi.yaml -o docs/index.html
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: my_site
-          path: ./docs
       - uses: actions/upload-pages-artifact@v1
         with:
           path: ./docs
       
   deploy:
-    needs: test_job
+    needs: build
     runs-on: ubuntu-latest 
     environment:
       name: github-pages
