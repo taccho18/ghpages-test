@@ -20,12 +20,16 @@ jobs:
       # first checkout your code
       - name: Checkout
         uses: actions/checkout@v2
-
-      # then use redoc-cli-github-action to generate your HTML bundle
-      - name: redoc-cli test
-        uses: seeebiii/redoc-cli-github-action@v10
+        
+      - uses: actions/setup-node@v2
         with:
-          args: 'bundle build openapi.yaml -o docs/index.html'
+          node-version: '16'
+          cache: npm
+      
+      - name: install & build
+        run: |
+          npm install -g redoc-cli
+          bundle build openapi.yaml -o docs/index.html
       
   deploy:
     needs: test_job
