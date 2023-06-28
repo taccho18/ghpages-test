@@ -28,7 +28,7 @@ jobs:
           args: 'bundle build openapi.yaml -o docs/index.html'
       
   deploy:
-    needs: build
+    needs: test_job
     runs-on: ubuntu-latest 
     environment:
       name: github-pages
