@@ -1,0 +1,41 @@
+name: openapi deploy
+
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+
+defaults:
+  run: 
+    working-directory: .
+
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    name: Test
+    steps:
+
+      # first checkout your code
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # then use redoc-cli-github-action to generate your HTML bundle
+      - name: redoc-cli test
+        uses: seeebiii/redoc-cli-github-action@v10
+        with:
+          args: 'bundle build openapi.yaml -o docs/index.html'
+      
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest 
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/deploy-pages@v1
+        id: deployment
