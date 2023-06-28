@@ -19,17 +19,18 @@ jobs:
 
       # first checkout your code
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'
           cache: npm
+          cache-dependency-path: ./package-lock.json
       
       - name: install & build
         run: |
           npm install -g redoc-cli
-          bundle build openapi.yaml -o docs/index.html
+          redoc-cli bundle openapi.yaml -o docs/index.html
       
   deploy:
     needs: test_job
